@@ -1,17 +1,10 @@
 const inquirer = require('inquirer');
 
-// const fs = require('fs');
+const fs = require('fs');
 
-// const generatePage = require('./src/page-template');
-
-// const pageHtml = generatePage(name, github);
+const generatePage = require('./src/page-template');
 
 
-// fs.writeFile('./index.html', pageHtml, err => {
-//     if (err) throw err;
-
-//     console.log('Portfolio complete! Check out index.html to see the output!');
-// });
 const promptUser = () => {
     return inquirer.prompt([
 
@@ -51,7 +44,7 @@ const promptUser = () => {
             type: 'input',
             name: 'about',
             message: 'Provide some information about yourself:',
-            when: ({confirmAbout}) => {
+            when: ({ confirmAbout }) => {
                 if (confirmAbout) {
                     return true;
                 } else {
@@ -105,7 +98,7 @@ const promptProject = portfolioData => {
             type: 'checkbox',
             name: 'languages',
             message: 'What did you build this project with? (Check all that apply)',
-            choices: ['Javascript','HTML','CSS','ES6','jQuery','Bootstrap','Node']
+            choices: ['Javascript', 'HTML', 'CSS', 'ES6', 'jQuery', 'Bootstrap', 'Node']
         },
         {
             type: 'input',
@@ -133,16 +126,27 @@ const promptProject = portfolioData => {
             default: false
         }
     ])
-    .then(projectData => {
-        portfolioData.projects.push(projectData);
-        if (projectData.confirmAddProject) {
-            return promptProject(portfolioData);
-        } else {
-            return portfolioData;
-        }
-    });
+        .then(projectData => {
+            portfolioData.projects.push(projectData);
+            if (projectData.confirmAddProject) {
+                return promptProject(portfolioData);
+            } else {
+                return portfolioData;
+            }
+        });
 };
 
 promptUser()
     .then(promptProject)
-    .then(portfolioData => console.log(portfolioData));
+    .then(portfolioData => {
+        const pageHtml = generatePage(portfolioData);
+
+
+        fs.writeFile('./index.html', pageHtml, err => {
+            if (err) throw err;
+
+            console.log('Portfolio complete! Check out index.html to see the output!');
+        });
+    });
+
+
